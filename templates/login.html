@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Login | Vision Labs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; flex-direction: column; }
+        .navbar { background: #fff !important; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
+        .navbar-brand { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #0d6efd !important; }
+        
+        .login-container { flex: 1; display: flex; align-items: center; padding: 60px 0; }
+        .login-card {
+            border: none; border-radius: 20px;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.08);
+            background: #fff; overflow: hidden;
+        }
+        .info-side {
+            background: linear-gradient(135deg, #0b2545 0%, #0d6efd 100%);
+            color: white; padding: 45px; display: flex;
+            flex-direction: column; justify-content: center; text-align: center;
+        }
+        .form-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.8px; color: #6c757d; font-weight: 600; }
+        .form-control { border-radius: 10px; padding: 12px 18px; border: 1px solid #e1e8ed; }
+        .form-control:focus { box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1); border-color: #0d6efd; }
+        
+        .btn-login {
+            background: #0d6efd; color: white; border-radius: 50px;
+            padding: 12px; font-weight: 600; border: none; transition: 0.3s;
+        }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(13, 110, 253, 0.2); background: #0b5ed7; }
+        
+        .footer { background: #1a1a1a; color: #adb5bd; padding: 30px 0; margin-top: auto; }
+        .alert-custom { border-radius: 12px; border: none; font-size: 0.9rem; }
+        
+        /* Floating background elements for professional look */
+        .login-card::before {
+            content: ""; position: absolute; top: -10%; right: -10%; 
+            width: 200px; height: 200px; background: rgba(13, 110, 253, 0.03); 
+            border-radius: 50%; z-index: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light py-3 sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <i class="fa-solid fa-microscope me-2"></i>VISION LABS
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link px-3" href="{{ url_for('home') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="{{ url_for('predict') }}">Predict</a></li>
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link px-3" href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                        <li class="nav-item ms-lg-3"><a class="btn btn-outline-danger rounded-pill px-4" href="{{ url_for('logout') }}">Logout</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link px-3 text-primary fw-bold" href="{{ url_for('login') }}">Login</a></li>
+                        <li class="nav-item ms-lg-3"><a class="btn btn-primary rounded-pill px-4" href="{{ url_for('signup') }}">Join Now</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger alert-custom alert-dismissible fade show shadow-sm" role="alert">
+                        <i class="fa-solid fa-circle-exclamation me-2"></i> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="login-container container">
+        <div class="row justify-content-center w-100 m-0">
+            <div class="col-lg-10 col-xl-8 p-0">
+                <div class="card login-card shadow-lg">
+                    <div class="row g-0">
+                        <div class="col-md-5 info-side d-none d-md-flex">
+                            <i class="fa-solid fa-user-shield fa-4x mb-4 opacity-50"></i>
+                            <h3 class="fw-bold mb-3">Vision Labs Portal</h3>
+                            <p class="small opacity-75">Access your AI-powered skin health dashboard and historical scans.</p>
+                            <div class="mt-4 pt-4 border-top border-white border-opacity-10 text-start w-100">
+                                <p class="mb-2"><i class="fa-solid fa-cloud-check me-2 text-info"></i> S3 Cloud Storage</p>
+                                <p class="mb-2"><i class="fa-solid fa-database me-2 text-info"></i> Atlas Data Sync</p>
+                                <p class="mb-0"><i class="fa-solid fa-brain me-2 text-info"></i> EfficientNet-B0 Analysis</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-7 p-4 p-md-5 position-relative" style="z-index: 1;">
+                            <div class="mb-5">
+                                <h2 class="fw-bold text-dark">Welcome Back</h2>
+                                <p class="text-muted small">Please enter your credentials to continue to **Vision Labs**.</p>
+                            </div>
+                            
+                            <form action="{{ url_for('login') }}" method="POST">
+                                <div class="mb-3">
+                                    <label class="form-label">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-envelope"></i></span>
+                                        <input type="email" name="email" class="form-control border-start-0" placeholder="lucknow.user@email.com" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label">Secure Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-lock"></i></span>
+                                        <input type="password" name="password" class="form-control border-start-0" placeholder="••••••••" required>
+                                    </div>
+                                    <div class="text-end mt-2">
+                                        <a href="#" class="text-decoration-none small text-primary opacity-75">Forgot Password?</a>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-login w-100 shadow-sm">
+                                    Enter Dashboard <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>
+                                </button>
+                            </form>
+                            
+                            <div class="mt-5 text-center">
+                                <p class="small text-muted mb-0">Don't have an account? <a href="{{ url_for('signup') }}" class="text-decoration-none fw-bold text-primary">Sign Up for Free</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer text-center">
+        <div class="container">
+            <h6 class="text-white fw-bold mb-2">VISION LABS</h6>
+            <p class="small opacity-50 mb-0">© 2026 DermAI Project | Engineered in Lucknow, India</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
