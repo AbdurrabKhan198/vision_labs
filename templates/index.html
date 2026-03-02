@@ -49,6 +49,15 @@
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-30px); }
         }
+        
+        /* Glassmorphism effect for stats */
+        .glass-stat {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -102,37 +111,32 @@
             <div class="row align-items-center">
                 <div class="col-lg-7 text-lg-start text-center">
                     <div class="badge bg-white text-primary mb-4 py-2 px-3 rounded-pill fw-bold shadow-lg">
-                        <i class="fa-solid fa-bolt-lightning me-2"></i> S3-CLOUD POWERED ANALYSIS
+                        <i class="fa-solid fa-wind me-2"></i> REAL-TIME AQI & AI ANALYSIS
                     </div>
                     
-                    <h1 class="hero-heading mb-3">INSTANT SKIN DIAGNOSIS</h1>
+                    <h1 class="hero-heading mb-3 text-uppercase">Smart Skin Diagnosis</h1>
                     <p class="lead mb-5 opacity-90 pe-lg-5">
-                        Experience the future of dermatology. **Vision Labs DermAI** identifies 
-                        <strong>Acne</strong>, <strong>Eczema</strong>, and <strong>Pigmentation</strong> in seconds using medical-grade **EfficientNet-B0** logic.
+                        Abdurrab Khan's <strong>Vision Labs DermAI</strong> uses medical-grade <strong>EfficientNet-B0</strong> to detect 
+                        Acne, Eczema, and Pigmentation while tracking environmental factors like AQI.
                     </p>
 
                     <div class="mb-5">
-                        <form action="{{ url_for('predict') }}" method="post" enctype="multipart/form-data">
-                            <label class="btn btn-white btn-lg px-5 py-3 rounded-pill fw-bold text-primary shadow-lg border-0 transform-hover bg-white">
-                                <i class="fa-solid fa-camera-retro me-2"></i> START CLOUD SCAN
-                                <input type="file" name="file" style="display: none;" onchange="this.form.submit()">
-                            </label>
-                        </form>
-                        <p class="mt-3 text-white-50 small"><i class="fa-solid fa-shield-halved me-1"></i> Your images are securely stored in AWS S3 Mumbai Datacenter.</p>
+                        <a href="{{ url_for('predict') }}" class="btn btn-white btn-lg px-5 py-3 rounded-pill fw-bold text-primary shadow-lg border-0 transform-hover bg-white text-decoration-none">
+                            <i class="fa-solid fa-camera-retro me-2"></i> START FREE SCAN
+                        </a>
+                        <p class="mt-3 text-white-50 small"><i class="fa-solid fa-shield-halved me-1 text-info"></i> SECURE AWS S3 & MONGODB ATLAS STORAGE</p>
                     </div>
 
-                    <div class="d-flex flex-wrap justify-content-lg-start justify-content-center gap-4 border-top border-white border-opacity-25 pt-4">
-                        <div><h5 class="mb-0 fw-bold">Cloud-Native</h5><small class="opacity-75">S3 Storage</small></div>
-                        <div class="vr bg-white opacity-50"></div>
-                        <div><h5 class="mb-0 fw-bold">Atlas Sync</h5><small class="opacity-75">MongoDB Ready</small></div>
-                        <div class="vr bg-white opacity-50"></div>
-                        <div><h5 class="mb-0 fw-bold">High Recall</h5><small class="opacity-75">Tuned Logic</small></div>
+                    <div class="d-flex flex-wrap justify-content-lg-start justify-content-center gap-4 pt-4 border-top border-white border-opacity-25">
+                        <div class="glass-stat"><h6 class="mb-0 fw-bold">AQI SYNC</h6><small class="opacity-75">Live Air Tracking</small></div>
+                        <div class="glass-stat"><h6 class="mb-0 fw-bold">S3 CLOUD</h6><small class="opacity-75">Secure Uploads</small></div>
+                        <div class="glass-stat"><h6 class="mb-0 fw-bold">AI ENGINE</h6><small class="opacity-75">EfficientNet-B0</small></div>
                     </div>
                 </div>
 
                 <div class="col-lg-5 d-none d-lg-block text-center">
                     <div class="floating-icon">
-                        <i class="fa-solid fa-microscope fa-10x text-white"></i>
+                        <i class="fa-solid fa-stethoscope fa-10x text-white"></i>
                     </div>
                 </div>
             </div>
@@ -141,27 +145,28 @@
 
     <section class="py-5 bg-white" id="how-it-works">
         <div class="container py-5">
-            <h2 class="text-center mb-5 fw-bold">How Vision Labs Works</h2>
-            <div class="row g-4">
+            <h2 class="text-center mb-5 fw-bold text-primary text-uppercase">Digital Skincare Workflow</h2>
+            
+            <div class="row g-4 mt-4">
                 <div class="col-md-4">
                     <div class="step-card">
-                        <div class="step-icon"><i class="fa-solid fa-upload"></i></div>
-                        <h4 class="fw-bold">1. Quick Upload</h4>
-                        <p class="text-muted">Upload a clear photo of the affected area. Our system instantly pushes it to AWS S3 Cloud.</p>
+                        <div class="step-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                        <h4 class="fw-bold">1. Cloud Upload</h4>
+                        <p class="text-muted">Image is instantly pushed to AWS S3 Mumbai Datacenter for secure, fast processing.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="step-card">
-                        <div class="step-icon"><i class="fa-solid fa-brain"></i></div>
-                        <h4 class="fw-bold">2. AI Processing</h4>
-                        <p class="text-muted">EfficientNet-B0 analyzes textures to detect Acne, Eczema, or Pigmentation with high confidence.</p>
+                        <div class="step-icon"><i class="fa-solid fa-microchip"></i></div>
+                        <h4 class="fw-bold">2. Environment Sync</h4>
+                        <p class="text-muted">We fetch live AQI data from WAQI API based on your location to correlate with skin health.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="step-card">
-                        <div class="step-icon"><i class="fa-solid fa-square-check"></i></div>
-                        <h4 class="fw-bold">3. Secure History</h4>
-                        <p class="text-muted">Results are synced to MongoDB Atlas, accessible anytime through your personal dashboard.</p>
+                        <div class="step-icon"><i class="fa-solid fa-database"></i></div>
+                        <h4 class="fw-bold">3. Result Log</h4>
+                        <p class="text-muted">Final diagnosis and environmental stats are synced to MongoDB Atlas for your history.</p>
                     </div>
                 </div>
             </div>
@@ -178,7 +183,7 @@
                 <a href="#" class="footer-link">Privacy Policy</a>
             </div>
             <div class="border-top border-secondary pt-4 mt-4 opacity-50 small">
-                <p>© 2026 Vision Labs | Developed in Lucknow, India | Powered by AWS & MongoDB</p>
+                <p>© 2026 Vision Labs | Engineered by Abdurrab Khan in Lucknow, India | Powered by AWS & MongoDB</p>
             </div>
         </div>
     </footer>
