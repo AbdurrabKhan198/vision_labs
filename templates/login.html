@@ -19,7 +19,7 @@
             box-shadow: 0 15px 45px rgba(0,0,0,0.08);
             background: #fff; overflow: hidden;
         }
-        .info-side {
+        .hero-side {
             background: linear-gradient(135deg, #0b2545 0%, #0d6efd 100%);
             color: white; padding: 45px; display: flex;
             flex-direction: column; justify-content: center; text-align: center;
@@ -36,13 +36,6 @@
         
         .footer { background: #1a1a1a; color: #adb5bd; padding: 30px 0; margin-top: auto; }
         .alert-custom { border-radius: 12px; border: none; font-size: 0.9rem; }
-        
-        /* Floating background elements for professional look */
-        .login-card::before {
-            content: ""; position: absolute; top: -10%; right: -10%; 
-            width: 200px; height: 200px; background: rgba(13, 110, 253, 0.03); 
-            border-radius: 50%; z-index: 0;
-        }
     </style>
 </head>
 <body>
@@ -61,7 +54,7 @@
                         <li class="nav-item ms-lg-3"><a class="btn btn-outline-danger rounded-pill px-4" href="{{ url_for('logout') }}">Logout</a></li>
                     {% else %}
                         <li class="nav-item"><a class="nav-link px-3 text-primary fw-bold" href="{{ url_for('login') }}">Login</a></li>
-                        <li class="nav-item ms-lg-3"><a class="btn btn-primary rounded-pill px-4" href="{{ url_for('signup') }}">Join Now</a></li>
+                        <li class="nav-item ms-lg-3"><a class="btn btn-primary rounded-pill px-4 text-white fw-bold" href="{{ url_for('signup') }}">Join Free</a></li>
                     {% endif %}
                 </ul>
             </div>
@@ -86,21 +79,22 @@
             <div class="col-lg-10 col-xl-8 p-0">
                 <div class="card login-card shadow-lg">
                     <div class="row g-0">
-                        <div class="col-md-5 info-side d-none d-md-flex">
-                            <i class="fa-solid fa-user-shield fa-4x mb-4 opacity-50"></i>
-                            <h3 class="fw-bold mb-3">Vision Labs Portal</h3>
-                            <p class="small opacity-75">Access your AI-powered skin health dashboard and historical scans.</p>
-                            <div class="mt-4 pt-4 border-top border-white border-opacity-10 text-start w-100">
-                                <p class="mb-2"><i class="fa-solid fa-cloud-check me-2 text-info"></i> S3 Cloud Storage</p>
-                                <p class="mb-2"><i class="fa-solid fa-database me-2 text-info"></i> Atlas Data Sync</p>
-                                <p class="mb-0"><i class="fa-solid fa-brain me-2 text-info"></i> EfficientNet-B0 Analysis</p>
+                        <div class="col-md-5 hero-side d-none d-md-flex">
+                            <i class="fa-solid fa-shield-halved fa-4x mb-4 opacity-50"></i>
+                            <h3 class="fw-bold">Welcome Back</h3>
+                            <p class="small opacity-75">Securely access your skin health data and history.</p>
+                            <hr class="w-25 mx-auto border-white opacity-25">
+                            <div class="text-start w-100 mt-3 small">
+                                <p class="mb-2"><i class="fa-solid fa-wind me-2 text-info"></i> Real-time AQI Sync</p>
+                                <p class="mb-2"><i class="fa-solid fa-cloud-check me-2 text-info"></i> AWS S3 Secured</p>
+                                <p class="mb-0"><i class="fa-solid fa-brain me-2 text-info"></i> EfficientNet-B0 Logic</p>
                             </div>
                         </div>
 
-                        <div class="col-md-7 p-4 p-md-5 position-relative" style="z-index: 1;">
+                        <div class="col-md-7 p-4 p-md-5">
                             <div class="mb-5">
-                                <h2 class="fw-bold text-dark">Welcome Back</h2>
-                                <p class="text-muted small">Please enter your credentials to continue to **Vision Labs**.</p>
+                                <h2 class="fw-bold text-dark text-uppercase">Member Login</h2>
+                                <p class="text-muted small">Enter your credentials to enter the Vision Labs Portal.</p>
                             </div>
                             
                             <form action="{{ url_for('login') }}" method="POST">
@@ -108,7 +102,7 @@
                                     <label class="form-label">Email Address</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-envelope"></i></span>
-                                        <input type="email" name="email" class="form-control border-start-0" placeholder="lucknow.user@email.com" required>
+                                        <input type="email" name="email" class="form-control border-start-0" placeholder="yourname@domain.com" required>
                                     </div>
                                 </div>
 
@@ -119,17 +113,17 @@
                                         <input type="password" name="password" class="form-control border-start-0" placeholder="••••••••" required>
                                     </div>
                                     <div class="text-end mt-2">
-                                        <a href="#" class="text-decoration-none small text-primary opacity-75">Forgot Password?</a>
+                                        <a href="#" class="text-decoration-none small text-muted">Forgot Password?</a>
                                     </div>
                                 </div>
 
                                 <button type="submit" class="btn btn-login w-100 shadow-sm">
-                                    Enter Dashboard <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>
+                                    Access Portal <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>
                                 </button>
                             </form>
                             
                             <div class="mt-5 text-center">
-                                <p class="small text-muted mb-0">Don't have an account? <a href="{{ url_for('signup') }}" class="text-decoration-none fw-bold text-primary">Sign Up for Free</a></p>
+                                <p class="small text-muted mb-0">New to Vision Labs? <a href="{{ url_for('signup') }}" class="text-decoration-none fw-bold text-primary">Create an Account</a></p>
                             </div>
                         </div>
                     </div>
@@ -141,7 +135,7 @@
     <footer class="footer text-center">
         <div class="container">
             <h6 class="text-white fw-bold mb-2">VISION LABS</h6>
-            <p class="small opacity-50 mb-0">© 2026 DermAI Project | Engineered in Lucknow, India</p>
+            <p class="small opacity-50 mb-0">© 2026 DermAI Project | Developed in Lucknow</p>
         </div>
     </footer>
 
