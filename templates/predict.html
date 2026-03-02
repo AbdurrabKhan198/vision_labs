@@ -3,87 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Predict | Vision Labs</title>
+    <title>AI Diagnostic Portal | Vision Labs</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #f0f4f8; min-height: 100vh; display: flex; flex-direction: column; }
-        .navbar { background: white !important; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
-        .predict-container { flex: 1; display: flex; align-items: center; padding: 40px 0; }
-        .result-card { border: none; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); background: #fff; }
-        .upload-area { border: 2px dashed #0d6efd; border-radius: 15px; padding: 30px; text-align: center; cursor: pointer; background: #f8fbff; transition: 0.3s; }
-        .upload-area:hover { background: #eef5ff; }
-        .user-image { width: 100%; max-height: 350px; object-fit: cover; border-radius: 12px; border: 4px solid #f0f4f8; }
-        .confidence-badge { font-size: 1.2rem; font-weight: 700; color: #0d6efd; }
-        .footer { background: #1a1a1a; color: #adb5bd; padding: 30px 0; margin-top: auto; }
-        #preview { display: none; margin-top: 15px; max-height: 200px; border-radius: 10px; }
+        :root {
+            --primary-grad: linear-gradient(135deg, #0d6efd 0%, #0043a8 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+        }
+        body { font-family: 'Poppins', sans-serif; background: #f4f7fa; color: #2d3436; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        /* Navbar Styling */
+        .navbar { background: var(--glass-bg) !important; backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.03); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .navbar-brand { font-size: 1.5rem; letter-spacing: -0.5px; }
+
+        .predict-container { flex: 1; padding: 60px 0; }
+        
+        /* Main Card Styling */
+        .result-card { border: none; border-radius: 30px; box-shadow: 0 20px 60px rgba(13, 110, 253, 0.08); background: #fff; position: relative; overflow: hidden; }
+        
+        /* Loader Overlay */
+        #loader { 
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255,255,255,0.98); z-index: 100; align-items: center; justify-content: center; flex-direction: column; 
+        }
+
+        /* Scan Section UI */
+        .upload-area { 
+            border: 2.5px dashed #dee2e6; border-radius: 25px; padding: 60px 40px; 
+            text-align: center; cursor: pointer; background: #fafbfc; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
+        }
+        .upload-area:hover { border-color: #0d6efd; background: #f0f7ff; transform: translateY(-2px); }
+        
+        .user-image { width: 100%; max-height: 420px; object-fit: cover; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        
+        /* Badges & Info Boxes */
+        .badge-pill { padding: 8px 16px; border-radius: 50px; font-weight: 600; font-size: 0.75rem; }
+        .confidence-badge { font-size: 1.8rem; font-weight: 700; color: #0d6efd; line-height: 1; }
+        
+        .aqi-card { background: #fff9e6; border: 1px solid #ffeeba; border-radius: 20px; padding: 20px; }
+        .severity-card { border-radius: 20px; padding: 20px; border: none; transition: 0.3s; }
+
+        /* Specialist Cards */
+        .clinic-card { 
+            background: #fff; border: 1px solid #f1f3f5 !important; border-radius: 20px; 
+            padding: 18px; transition: all 0.3s ease; 
+        }
+        .clinic-card:hover { transform: scale(1.02); box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important; border-color: #0d6efd !important; }
+
+        .home-care-card { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 22px; padding: 25px; }
+        
+        .btn-primary { background: var(--primary-grad); border: none; padding: 12px 30px; font-weight: 600; border-radius: 50px; transition: 0.3s; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3); }
+
+        .footer { background: #fff; border-top: 1px solid #eee; padding: 30px 0; font-size: 0.85rem; color: #636e72; }
+
+        /* Print optimization */
+        @media print { .navbar, .btn, .footer, .upload-area { display: none !important; } }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-light py-3 sticky-top">
+    <nav class="navbar navbar-expand-lg py-3 sticky-top">
         <div class="container">
-            <a class="navbar-brand fw-bold text-primary" href="{{ url_for('home') }}"><i class="fa-solid fa-microscope me-2"></i>VISION LABS</a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link px-3" href="{{ url_for('home') }}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link px-3" href="{{ url_for('predict') }}">Predict</a></li>
-                    {% if current_user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link px-3" href="{{ url_for('dashboard') }}">Dashboard</a></li>
-                        <li class="nav-item ms-lg-3"><a class="btn btn-outline-danger rounded-pill px-4" href="{{ url_for('logout') }}">Logout</a></li>
-                    {% else %}
-                        <li class="nav-item"><a class="nav-link px-3" href="{{ url_for('login') }}">Login</a></li>
-                    {% endif %}
-                </ul>
+            <a class="navbar-brand fw-bold text-primary" href="{{ url_for('home') }}">
+                <i class="fa-solid fa-wand-magic-sparkles me-2"></i>VISION LABS
+            </a>
+            <div class="ms-auto">
+                {% if current_user.is_authenticated %}
+                    <a class="btn btn-light rounded-pill px-4 text-primary fw-600" href="{{ url_for('dashboard') }}">Dashboard</a>
+                    <a class="btn btn-outline-danger border-0 rounded-pill ms-2" href="{{ url_for('logout') }}"><i class="fa-solid fa-power-off"></i></a>
+                {% endif %}
             </div>
         </div>
     </nav>
 
     <div class="predict-container container">
-        <div class="row justify-content-center w-100 m-0">
-            <div class="col-lg-9">
+        <div class="row justify-content-center">
+            <div class="col-xl-11">
                 <div class="card result-card p-4 p-md-5">
                     
+                    <div id="loader">
+                        <div class="spinner-grow text-primary mb-4" role="status" style="width: 3rem; height: 3rem;"></div>
+                        <h4 class="fw-bold text-dark">Neural Engine Working...</h4>
+                        <p class="text-muted">Scanning for pathogens & fetching local data in {{ city }}</p>
+                    </div>
+                    
                     {% if prediction %}
-                    <div class="text-center">
-                        <h2 class="fw-bold mb-4">Diagnostic Report</h2>
-                        <div class="row align-items-center">
-                            <div class="col-md-6 mb-4">
-                                <img src="{{ user_image }}" class="user-image shadow-sm" alt="Analyzed Skin">
+                    <div class="diagnostic-flow">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5 gap-3">
+                            <div class="text-center text-md-start">
+                                <span class="badge bg-primary-subtle text-primary mb-2 rounded-pill px-3">Scan Verified</span>
+                                <h2 class="fw-bold mb-0">Diagnostic Report</h2>
+                                <p class="text-muted small">ID: #SCAN-{{ current_user.id[:5] }}-2026</p>
                             </div>
-                            <div class="col-md-6 text-md-start px-4">
-                                <div class="mb-3">
-                                    <label class="text-muted small text-uppercase fw-bold">Detected Condition</label>
-                                    <h3 class="text-primary fw-bold">{{ prediction }}</h3>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="text-muted small text-uppercase fw-bold">AI Confidence</label>
-                                    <div class="confidence-badge">{{ confidence }}</div>
-                                    <div class="progress mt-2" style="height: 8px; border-radius: 10px;">
-                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ confidence }}"></div>
+                            <div class="text-end">
+                                <button onclick="window.print()" class="btn btn-light rounded-pill border shadow-sm px-4">
+                                    <i class="fa-solid fa-download me-2"></i>PDF Report
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row g-5">
+                            <div class="col-lg-5">
+                                <div class="position-relative">
+                                    <img src="{{ user_image }}" class="user-image" alt="Skin Scan">
+                                    <div class="position-absolute bottom-0 end-0 m-3">
+                                        <div class="bg-white p-2 rounded-3 shadow-sm text-center border">
+                                            <small class="text-muted d-block" style="font-size: 10px;">MATCH RATE</small>
+                                            <span class="fw-bold text-primary">{{ confidence }}</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <p class="small text-muted"><i class="fa-solid fa-circle-info"></i> Powered by EfficientNet-B0 Engine.</p>
-                                <a href="{{ url_for('predict') }}" class="btn btn-primary w-100 rounded-pill py-2">Start New Scan</a>
+                                
+                                <div class="aqi-card mt-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-white p-3 rounded-circle shadow-sm">
+                                            <i class="fa-solid fa-leaf text-success fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">City AQI ({{ city }})</small>
+                                            <h4 class="fw-bold mb-0 text-dark">{{ aqi }}</h4>
+                                        </div>
+                                    </div>
+                                    <p class="small text-muted mt-3 mb-0"><i class="fa-solid fa-circle-info me-1"></i> {{ analysis.aqi_advice }}</p>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-7">
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <div class="severity-card bg-primary-subtle border-primary h-100">
+                                            <label class="small text-primary fw-bold text-uppercase opacity-75">Detection</label>
+                                            <h3 class="fw-bold text-primary mb-0">{{ prediction }}</h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="severity-card h-100 {% if analysis.severity == 'Severe' %}bg-danger text-white{% else %}bg-dark text-white{% endif %}">
+                                            <label class="small fw-bold text-uppercase opacity-50">Triage Level</label>
+                                            <h3 class="fw-bold mb-0">{{ analysis.severity }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% if show_doctors %}
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="fw-bold text-dark m-0"><i class="fa-solid fa-stethoscope text-primary me-2"></i> Nearby Specialists</h6>
+                                        <span class="badge-pill bg-light text-muted border small">Top Rated</span>
+                                    </div>
+                                    <div class="row g-2">
+                                        {% if clinics %}
+                                            {% for clinic in clinics %}
+                                            <div class="col-12">
+                                                <div class="card clinic-card shadow-sm border-0">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div class="pe-3">
+                                                            <h6 class="fw-bold mb-1">{{ clinic.name }}</h6>
+                                                            <p class="x-small text-muted mb-0"><i class="fa-solid fa-map-marker-alt me-1"></i> {{ clinic.address[:60] }}...</p>
+                                                        </div>
+                                                        <div class="text-end">
+                                                            <div class="mb-2"><span class="badge bg-warning text-dark"><i class="fa-solid fa-star me-1"></i>{{ clinic.rating }}</span></div>
+                                                            <a href="https://www.google.com/maps/search/?api=1&query={{ clinic.name }}&query_place_id={{ clinic.place_id }}" 
+                                                               target="_blank" class="btn btn-sm btn-primary py-1 px-3" style="font-size: 11px;">Directions</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="home-care-card mb-4">
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div class="bg-success text-white p-2 rounded-3"><i class="fa-solid fa-shield-heart"></i></div>
+                                        <h6 class="fw-bold text-success mb-0">Smart Home Care Advice</h6>
+                                    </div>
+                                    <p class="small text-dark opacity-75 mb-3">AI Analysis suggests this is a minor condition. No clinical visit required in {{ city }} at this stage.</p>
+                                    <div class="row g-2">
+                                        <div class="col-12 bg-white p-2 rounded-3 border-start border-success border-4 small"><i class="fa-solid fa-check text-success me-2"></i> Gentle cleaning with pH-neutral soap.</div>
+                                        <div class="col-12 bg-white p-2 rounded-3 border-start border-success border-4 small"><i class="fa-solid fa-check text-success me-2"></i> Avoid scratching or picking the area.</div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <div class="bg-light p-3 rounded-4 border-start border-primary border-5 mb-4">
+                                    <div class="d-flex gap-3 align-items-start">
+                                        <i class="fa-solid fa-comment-medical text-primary mt-1"></i>
+                                        <div>
+                                            <label class="text-uppercase fw-bold text-muted" style="font-size: 10px;">AI Recommendation</label>
+                                            <p class="small mb-0 text-dark fw-500">{{ analysis.doctor_visit }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid mt-4">
+                                    <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg shadow">Analyze Another Image</a>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {% else %}
-                    <div class="text-center">
-                        <i class="fa-solid fa-cloud-arrow-up fa-3x text-primary mb-3"></i>
-                        <h2 class="fw-bold">Upload Skin Image</h2>
-                        <p class="text-muted mb-4">Analyze Acne, Eczema, or Pigmentation instantly.</p>
+                    <div class="text-center py-5">
+                        <div class="bg-primary-subtle d-inline-block p-4 rounded-circle mb-4">
+                            <i class="fa-solid fa-camera-retro fa-3x text-primary"></i>
+                        </div>
+                        <h2 class="fw-bold text-dark">DermAI Analysis</h2>
+                        <p class="text-muted mb-5 mx-auto" style="max-width: 500px;">
+                            Advanced EfficientNet-B0 engine for instant detection of Acne, Eczema, and Pigmentation.
+                        </p>
                         
                         <form action="{{ url_for('predict') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
                             <div class="upload-area mb-4" onclick="document.getElementById('fileInput').click();">
-                                <h5 class="mb-1 fw-bold">Click to Upload Image</h5>
-                                <p class="small text-muted mb-0">Supports JPG, PNG (Max 5MB)</p>
-                                <img id="preview" src="#" alt="Preview" class="img-fluid border shadow-sm">
+                                <div id="upload-prompt">
+                                    <div class="bg-primary text-white d-inline-block p-3 rounded-circle mb-3 shadow">
+                                        <i class="fa-solid fa-plus fs-4"></i>
+                                    </div>
+                                    <h5 class="fw-bold text-dark">Select Patient Image</h5>
+                                    <p class="small text-muted mb-0">Drag and drop or click to browse files</p>
+                                </div>
+                                <img id="preview" src="#" alt="Preview" class="img-fluid">
                                 <input type="file" name="file" id="fileInput" style="display: none;" accept="image/*" onchange="previewImage(this);" required>
                             </div>
-                            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5" id="submitBtn" disabled>Analyze Now</button>
+                            <button type="submit" class="btn btn-primary btn-lg px-5 shadow-lg" id="submitBtn" disabled>
+                                Start Analysis <i class="fa-solid fa-arrow-right ms-2"></i>
+                            </button>
                         </form>
                     </div>
                     {% endif %}
@@ -93,27 +240,35 @@
         </div>
     </div>
 
-    <footer class="footer text-center">
-        <div class="container">
-            <h6 class="text-white fw-bold mb-2">VISION LABS</h6>
-            <p class="small opacity-50 mb-0">© 2026 DermAI Project | Engineered in Lucknow, UP</p>
+    <footer class="footer">
+        <div class="container text-center">
+            <p class="fw-bold text-dark mb-1">VISION LABS | SMART DERMA ENGINE</p>
+            <p class="mb-0 opacity-75">Cloud-Sync Enabled • {{ city }}, India</p>
         </div>
     </footer>
 
     <script>
         function previewImage(input) {
             const preview = document.getElementById('preview');
+            const prompt = document.getElementById('upload-prompt');
             const submitBtn = document.getElementById('submitBtn');
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     preview.src = e.target.result;
                     preview.style.display = 'inline-block';
+                    prompt.style.display = 'none';
                     submitBtn.disabled = false;
                 }
                 reader.readAsDataURL(input.files[0]);
             }
         }
+
+        document.getElementById('uploadForm').addEventListener('submit', function() {
+            document.getElementById('loader').style.display = 'flex';
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
